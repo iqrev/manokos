@@ -4,6 +4,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import Navbar from '@/components/Navbar';
 import BottomNav from '@/components/BottomNav';
 import ReactQueryProvider from '@/components/ReactQueryProvider';
+import InstallPromptWrapper from '@/components/InstallPromptWrapper';
 
 export const metadata: Metadata = {
   title: 'Manokos – Direktori Kos & Kontrakan Terpercaya di Jambi',
@@ -32,6 +33,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="id">
       <body>
+        {/* Service Worker Registration */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+              navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+          }
+        `}} />
         <ReactQueryProvider>
           <AuthProvider>
             <Navbar />
@@ -39,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </main>
             <BottomNav />
+            <InstallPromptWrapper />
           </AuthProvider>
         </ReactQueryProvider>
       </body>
