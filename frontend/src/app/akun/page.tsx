@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import {
   User, Settings, ChevronRight, LogOut, Bookmark, Home,
-  ShieldCheck, MessageCircle
+  ShieldCheck, MessageCircle, Bell
 } from 'lucide-react';
 
 export default function AkunPage() {
@@ -43,6 +43,7 @@ export default function AkunPage() {
   const menuItems = [
     ...(dashboardHref ? [{ href: dashboardHref, label: 'Dashboard', Icon: LayoutDashboard, sub: user.role === 'owner' ? 'Kelola listing kos' : 'Panel admin' }] : []),
     { href: '/simpan', label: 'Kos Tersimpan', Icon: Bookmark, sub: 'Listing yang disimpan' },
+    { href: '/akun/notifikasi', label: 'Email Notifikasi', Icon: Bell, sub: 'Atur peringatan kos baru' },
     { href: '/akun/pengaturan', label: 'Pengaturan Akun', Icon: Settings, sub: 'Edit profil & password' },
   ];
 

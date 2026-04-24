@@ -74,4 +74,9 @@ class User extends Authenticatable
     {
         return $this->role === 'owner';
     }
+
+    public function preferences(): HasOne
+    {
+        return $this->hasOne(UserPreference::class);
+    }
 }

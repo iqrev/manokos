@@ -28,6 +28,17 @@ Route::get('/properties/{id}/reviews', [ReviewController::class, 'index']);
 // Public Changelog
 Route::get('/changelog', [UpdateLogController::class, 'publicIndex']);
 
+// Unsubscribe
+Route::get('/unsubscribe', function (Request $request) {
+    $token = $request->query('token');
+    $pref = \App\Models\UserPreference::where('unsubscribe_token', $token)->first();
+    if ($pref) {
+        $pref->update(['notify_email' => false]);
+        return "<h1>Berhasil!</h1><p>Anda telah berhenti berlangganan notifikasi email Manokos.</p><a href='https://manokos.id'>Kembali ke Beranda</a>";
+    }
+    return "Token tidak valid.";
+});
+
 // Authenticated Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -37,6 +48,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bookmarks', [BookmarkController::class, 'index']);
     Route::post('/bookmarks/{propertyId}/toggle', [BookmarkController::class, 'toggle']);
     Route::get('/bookmarks/{propertyId}/status', [BookmarkController::class, 'status']);
+
+    // User Preferences
+    Route::get('/me/preferences', function (Request $request) {
+        $pref = $request->user()->preferences()->firstOrCreate([], ['unsubscribe_token' => \Illuminate\Support\Str::random(32)]);
+        return response()->json($pref);
+    });
+    Route::post('/me/preferences', function (Request $request) {
+        $request->validate([
+            'preferred_areas' => 'nullable|array',
+            'notify_email' => 'required|boolean',
+        ]);
+        $pref = $request->user()->preferences()->updateOrCreate([], $request->only(['preferred_areas', 'notify_email']));
+        return response()->json($pref);
+    });
 
     // Reviews
     Route::post('/properties/{id}/reviews', [ReviewController::class, 'store'])->middleware('throttle:5,1');
