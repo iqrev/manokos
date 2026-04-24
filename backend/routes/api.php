@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Owner\KycController as OwnerKycController;
 use App\Http\Controllers\Api\Admin\VerificationController;
 use App\Http\Controllers\Api\Admin\UpdateLogController;
 use App\Http\Controllers\Api\Admin\AdminController;
+use App\Http\Controllers\Api\ReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,7 @@ Route::get('/properties', [PropertyController::class, 'index']);
 Route::get('/properties/{id}', [PropertyController::class, 'show']);
 Route::post('/properties/{id}/click', [PropertyController::class, 'recordClick']);
 Route::post('/properties/{id}/report', [PropertyController::class, 'report'])->middleware('throttle:3,1');
+Route::get('/properties/{id}/reviews', [ReviewController::class, 'index']);
 
 // Public Changelog
 Route::get('/changelog', [UpdateLogController::class, 'publicIndex']);
@@ -35,6 +37,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bookmarks', [BookmarkController::class, 'index']);
     Route::post('/bookmarks/{propertyId}/toggle', [BookmarkController::class, 'toggle']);
     Route::get('/bookmarks/{propertyId}/status', [BookmarkController::class, 'status']);
+
+    // Reviews
+    Route::post('/properties/{id}/reviews', [ReviewController::class, 'store'])->middleware('throttle:5,1');
+    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
     // Owner Routes
     Route::prefix('owner')->group(function () {
         Route::post('/kyc', [OwnerKycController::class, 'submit'])->middleware('throttle:5,1');

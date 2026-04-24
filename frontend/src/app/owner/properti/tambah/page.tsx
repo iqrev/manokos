@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { MapPin, Upload } from 'lucide-react';
+import { MapPin, Upload, X, Images } from 'lucide-react';
 import api from '@/lib/api';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -23,6 +23,8 @@ export default function TambahPropertiPage() {
   const [facilities, setFacilities] = useState<number[]>([]);
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [previewImg, setPreviewImg] = useState('');
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [mapCoords, setMapCoords] = useState<[number, number]>([-1.6101, 103.6131]);
 
@@ -37,6 +39,7 @@ export default function TambahPropertiPage() {
       Object.entries(form).forEach(([k, v]) => fd.append(k, v));
       facilities.forEach(f => fd.append('facilities[]', String(f)));
       if (mainImage) fd.append('main_image', mainImage);
+      galleryFiles.forEach(f => fd.append('gallery[]', f));
       return api.post('/owner/properties', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
     },
     onSuccess: () => router.push('/owner'),
@@ -59,6 +62,19 @@ export default function TambahPropertiPage() {
 
   const handleLocationPick = (lat: number, lng: number) => {
     setForm(f => ({ ...f, latitude: String(lat), longitude: String(lng) }));
+  };
+
+  const handleGalleryPick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []).slice(0, 8);
+    setGalleryFiles(prev => {
+      const combined = [...prev, ...files].slice(0, 8);
+      setGalleryPreviews(combined.map(f => URL.createObjectURL(f)));
+      return combined;
+    });
+  };
+
+  const removeGalleryImage = (idx: number) => {
+    setGalleryFiles(prev => { const n = prev.filter((_, i) => i !== idx); setGalleryPreviews(n.map(f => URL.createObjectURL(f))); return n; });
   };
 
   const toggleFacility = (id: number) =>
@@ -98,6 +114,47 @@ export default function TambahPropertiPage() {
             <input id="main-image" type="file" accept="image/*" className="hidden" onChange={handleImagePick} />
           </label>
           {errors.main_image && <p className="text-red-500 text-[12px] mt-1">{errors.main_image}</p>}
+        </div>
+
+        {/* Gallery Images */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Images size={15} className="text-[var(--color-text-muted)]" />
+            <p className="text-[13px] font-700 text-[var(--color-text-secondary)] uppercase tracking-wide">Foto Galeri (Maks. 8)</p>
+          </div>
+          {galleryPreviews.length > 0 && (
+            <div className="grid grid-cols-4 gap-2 mb-3">
+              {galleryPreviews.map((src, idx) => (
+                <div key={idx} className="relative rounded-xl overflow-hidden aspect-square bg-gray-100">
+                  <img src={src} alt={`Galeri ${idx + 1}`} className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeGalleryImage(idx)}
+                    className="absolute top-1 right-1 bg-black/60 rounded-full p-0.5 text-white hover:bg-red-500 transition-colors"
+                    aria-label="Hapus foto"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+              {galleryPreviews.length < 8 && (
+                <label className="aspect-square rounded-xl border-2 border-dashed border-[var(--color-border)] flex items-center justify-center cursor-pointer hover:border-[var(--color-primary-300)] transition-colors">
+                  <Upload size={18} className="text-[var(--color-text-muted)]" />
+                  <input type="file" accept="image/*" multiple className="hidden" onChange={handleGalleryPick} />
+                </label>
+              )}
+            </div>
+          )}
+          {galleryPreviews.length === 0 && (
+            <label className="flex items-center gap-3 border border-dashed border-[var(--color-border)] rounded-2xl p-4 cursor-pointer hover:border-[var(--color-primary-300)] transition-colors">
+              <Upload size={20} className="text-[var(--color-text-muted)]" />
+              <div>
+                <p className="text-[13px] font-600 text-[var(--color-text-secondary)]">Ketuk untuk pilih foto galeri</p>
+                <p className="text-[11px] text-[var(--color-text-muted)]">Hingga 8 foto – JPG/PNG, maks 2MB tiap foto</p>
+              </div>
+              <input type="file" accept="image/*" multiple className="hidden" onChange={handleGalleryPick} />
+            </label>
+          )}
         </div>
 
         {/* Basic info */}

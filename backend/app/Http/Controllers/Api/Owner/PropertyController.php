@@ -29,6 +29,8 @@ class PropertyController extends Controller
             'longitude' => 'nullable|string',
             'whatsapp_number' => 'required|string',
             'main_image' => 'required|image|max:2048',
+            'gallery'    => 'nullable|array|max:8',
+            'gallery.*'  => 'image|max:2048',
             'facilities' => 'nullable|array',
         ]);
 
@@ -47,9 +49,19 @@ class PropertyController extends Controller
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'whatsapp_number' => $request->whatsapp_number,
-            'main_image' => $mainImagePath,
-            'status' => 'active',
+            'main_image'  => $mainImagePath,
+            'gallery'     => [],
+            'status'      => 'active',
         ]);
+
+        // Upload gallery photos
+        if ($request->hasFile('gallery')) {
+            $galleryPaths = [];
+            foreach ($request->file('gallery') as $file) {
+                $galleryPaths[] = $file->store('properties/gallery', 'public');
+            }
+            $property->update(['gallery' => $galleryPaths]);
+        }
 
         if ($request->has('facilities')) {
             $property->facilities()->sync($request->facilities);

@@ -71,6 +71,20 @@ export interface PropertyStat {
   whatsapp_clicks: number;
 }
 
+export interface Review {
+  id: number;
+  rating: number;
+  body?: string;
+  created_at: string;
+  user: { id: number; name: string };
+}
+
+export interface ReviewsResponse {
+  avg_rating: number | null;
+  total: number;
+  reviews: Review[];
+}
+
 export interface PropertyFilterParams {
   area?: string;
   type?: string;

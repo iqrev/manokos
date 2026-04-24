@@ -14,6 +14,7 @@ import { Property, FACILITY_ICONS } from '@/types';
 import { formatPrice, formatType, toWhatsAppUrl, buildWhatsAppMessage, cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import BookmarkButton from '@/components/BookmarkButton';
+import ReviewSection from '@/components/ReviewSection';
 
 const PropertyMap = dynamic(() => import('@/components/PropertyMap'), { ssr: false });
 
@@ -206,6 +207,9 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
             )}
+
+            {/* Reviews */}
+            <ReviewSection propertyId={id} />
 
             {/* Map */}
             {property.latitude && property.longitude && (

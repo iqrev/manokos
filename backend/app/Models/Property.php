@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Property extends Model
 {
@@ -53,5 +54,19 @@ class Property extends Model
     public function stats(): HasMany
     {
         return $this->hasMany(PropertyStat::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function avgRating(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->reviews()->avg('rating')
+                ? round($this->reviews()->avg('rating'), 1)
+                : null
+        );
     }
 }
