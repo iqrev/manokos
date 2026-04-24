@@ -9,6 +9,10 @@ class FacilityController extends Controller
 {
     public function index()
     {
-        return response()->json(Facility::all());
+        $facilities = \Illuminate\Support\Facades\Cache::remember('facilities', 86400, function () {
+            return Facility::all();
+        });
+
+        return response()->json($facilities);
     }
 }

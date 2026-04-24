@@ -44,12 +44,12 @@ class PropertyController extends Controller
     {
         $property = Property::with(['facilities', 'owner'])->findOrFail($id);
 
-        // Record a view stat
+        // Record a view stat (deferred to avoid blocking response)
         $today = now()->toDateString();
-        PropertyStat::updateOrCreate(
+        defer(fn () => PropertyStat::updateOrCreate(
             ['property_id' => $property->id, 'date' => $today],
             ['views' => \DB::raw('views + 1')]
-        );
+        ));
 
         return response()->json($property);
     }
@@ -59,10 +59,10 @@ class PropertyController extends Controller
         $property = Property::findOrFail($id);
         
         $today = now()->toDateString();
-        PropertyStat::updateOrCreate(
+        defer(fn () => PropertyStat::updateOrCreate(
             ['property_id' => $property->id, 'date' => $today],
             ['whatsapp_clicks' => \DB::raw('whatsapp_clicks + 1')]
-        );
+        ));
 
         return response()->json(['message' => 'Click tracked']);
     }

@@ -28,11 +28,12 @@ export default function PropertyCard({ property, variant = 'grid', className }: 
         <div className={cn('card w-64', className)}>
           {/* Image */}
           <div className="relative w-full h-36 overflow-hidden">
-            <img
+            <Image
               src={imageUrl}
               alt={property.title}
-              className="w-full h-full object-cover"
-              loading="lazy"
+              fill
+              className="object-cover"
+              unoptimized={imageUrl.startsWith('http')}
             />
             {property.is_boosted && (
               <span className="absolute top-2 left-2 badge" style={{ background: '#fef3c7', color: '#d97706' }}>
@@ -68,11 +69,12 @@ export default function PropertyCard({ property, variant = 'grid', className }: 
       <div className={cn('card h-full', className)}>
         {/* Image */}
         <div className="relative w-full h-48 overflow-hidden">
-          <img
+          <Image
             src={imageUrl}
             alt={property.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            unoptimized={imageUrl.startsWith('http')}
           />
           {property.is_boosted && (
             <span className="absolute top-3 left-3 badge" style={{ background: '#fef3c7', color: '#d97706', fontSize: '11px' }}>

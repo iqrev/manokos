@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public Routes
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
 Route::get('/facilities', [FacilityController::class, 'index']);
 
@@ -36,7 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bookmarks/{propertyId}/status', [BookmarkController::class, 'status']);
     // Owner Routes
     Route::prefix('owner')->group(function () {
-        Route::post('/kyc', [OwnerKycController::class, 'submit']);
+        Route::post('/kyc', [OwnerKycController::class, 'submit'])->middleware('throttle:5,1');
         Route::get('/kyc/status', [OwnerKycController::class, 'status']);
         
         Route::apiResource('properties', OwnerPropertyController::class);
