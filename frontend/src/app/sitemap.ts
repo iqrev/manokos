@@ -9,10 +9,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/cari`, changeFrequency: 'hourly', priority: 0.9 },
     { url: `${BASE}/login`, changeFrequency: 'monthly', priority: 0.3 },
     { url: `${BASE}/daftar`, changeFrequency: 'monthly', priority: 0.4 },
+    // SEO landing pages per kecamatan – clean URL, prerendered statically
     ...JAMBI_AREAS.map(area => ({
-      url: `${BASE}/cari?area=${encodeURIComponent(area)}`,
+      url: `${BASE}/kos/area/${area.toLowerCase().replace(/\s+/g, '-')}`,
       changeFrequency: 'daily' as const,
-      priority: 0.8,
+      priority: 0.85,
     })),
   ];
 
