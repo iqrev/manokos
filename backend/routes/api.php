@@ -21,6 +21,7 @@ Route::get('/facilities', [FacilityController::class, 'index']);
 Route::get('/properties', [PropertyController::class, 'index']);
 Route::get('/properties/{id}', [PropertyController::class, 'show']);
 Route::post('/properties/{id}/click', [PropertyController::class, 'recordClick']);
+Route::post('/properties/{id}/report', [PropertyController::class, 'report'])->middleware('throttle:3,1');
 
 // Public Changelog
 Route::get('/changelog', [UpdateLogController::class, 'publicIndex']);

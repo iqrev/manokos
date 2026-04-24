@@ -3,10 +3,10 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { SlidersHorizontal, Map, List, X, Search } from 'lucide-react';
+import { SlidersHorizontal, Map, MapPin, List, X, Search } from 'lucide-react';
 import api from '@/lib/api';
 import PropertyCard from '@/components/PropertyCard';
-import { PaginatedProperties, JAMBI_AREAS } from '@/types';
+import { PaginatedProperties, JAMBI_AREAS, Facility } from '@/types';
 import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 
@@ -23,7 +23,17 @@ function SearchPageInner() {
     type: '',
     min_price: '',
     max_price: '',
+    facilities: [] as number[],
+    lat: '',
+    lng: '',
     page: 1,
+  });
+
+  const [isLocating, setIsLocating] = useState(false);
+
+  const { data: allFacilities } = useQuery<Facility[]>({
+    queryKey: ['facilities'],
+    queryFn: () => api.get('/facilities').then(r => r.data).catch(() => []),
   });
 
   const queryString = new URLSearchParams({
@@ -31,6 +41,9 @@ function SearchPageInner() {
     ...(filters.type && { type: filters.type }),
     ...(filters.min_price && { min_price: filters.min_price }),
     ...(filters.max_price && { max_price: filters.max_price }),
+    ...(filters.facilities.length > 0 && { facilities: filters.facilities.join(',') }),
+    ...(filters.lat && { lat: filters.lat }),
+    ...(filters.lng && { lng: filters.lng }),
     page: String(filters.page),
     per_page: '12',
   }).toString();
@@ -41,10 +54,28 @@ function SearchPageInner() {
   });
 
   const resetFilters = () =>
-    setFilters({ area: '', type: '', min_price: '', max_price: '', page: 1 });
+    setFilters({ area: '', type: '', min_price: '', max_price: '', facilities: [], lat: '', lng: '', page: 1 });
 
-  const activeFilterCount = [filters.area, filters.type, filters.min_price, filters.max_price]
-    .filter(Boolean).length;
+  const toggleFacility = (id: number) =>
+    setFilters(f => ({ ...f, facilities: f.facilities.includes(id) ? f.facilities.filter(x => x !== id) : [...f.facilities, id], page: 1 }));
+
+  const handleNearbySearch = () => {
+    if (!navigator.geolocation) return alert('GPS tidak didukung browser ini.');
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        setFilters(f => ({ ...f, lat: String(pos.coords.latitude), lng: String(pos.coords.longitude), area: '', page: 1 }));
+        setIsLocating(false);
+      },
+      () => {
+        alert('Gagal mendapatkan lokasi. Pastikan izin GPS diaktifkan.');
+        setIsLocating(false);
+      }
+    );
+  };
+
+  const activeFilterCount = [filters.area, filters.type, filters.min_price, filters.max_price, filters.lat]
+    .filter(Boolean).length + filters.facilities.length;
 
   return (
     <div className="pb-nav">
@@ -87,6 +118,17 @@ function SearchPageInner() {
           </button>
         </div>
 
+        {/* GPS Button Mobile/Row */}
+        <div className="max-w-7xl mx-auto px-4 mt-3 flex items-center justify-between">
+          <button 
+            onClick={handleNearbySearch}
+            disabled={isLocating}
+            className="btn rounded-xl px-4 py-2 border border-[var(--color-primary-200)] bg-[var(--color-primary-50)] text-[var(--color-primary-600)] text-[12px] font-600 flex items-center gap-2 hover:bg-[var(--color-primary-100)]"
+          >
+            <MapPin size={14} /> {isLocating ? 'Melacak koordinat...' : 'Cari Kos di Sekitar Saya 📍'}
+          </button>
+        </div>
+
         {/* Filter Panel (Dropdown) */}
         {showFilters && (
           <div className="max-w-7xl mx-auto mt-3 bg-white rounded-2xl border border-[var(--color-border)] p-4 shadow-card animate-fade-up">
@@ -122,6 +164,30 @@ function SearchPageInner() {
                 )}
               </div>
             </div>
+
+            {/* Checkbox Fasilitas */}
+            {allFacilities && allFacilities.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-[var(--color-border)]">
+                <p className="text-[11px] font-700 text-[var(--color-text-muted)] uppercase tracking-wide mb-3">Fasilitas</p>
+                <div className="flex flex-wrap gap-2">
+                  {allFacilities.map(f => {
+                    const active = filters.facilities.includes(f.id);
+                    return (
+                      <button 
+                        key={f.id} 
+                        onClick={() => toggleFacility(f.id)}
+                        className={cn(
+                          'px-3 py-1.5 rounded-full border text-[12px] font-500 transition-colors', 
+                          active ? 'bg-[var(--color-primary-500)] border-[var(--color-primary-500)] text-white' : 'bg-white border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary-300)]'
+                        )}
+                      >
+                        {f.name}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

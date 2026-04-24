@@ -34,6 +34,9 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
 
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportForm, setReportForm] = useState({ reason: '', details: '' });
+
   const { data: property, isLoading } = useQuery<Property>({
     queryKey: ['property', id],
     queryFn: () => api.get(`/properties/${id}`).then(r => r.data),
@@ -41,6 +44,16 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
   const clickMutation = useMutation({
     mutationFn: () => api.post(`/properties/${id}/click`),
+  });
+
+  const reportMutation = useMutation({
+    mutationFn: (data: typeof reportForm) => api.post(`/properties/${id}/report`, data),
+    onSuccess: () => {
+      alert('Laporan berhasil dikirim. Terima kasih atas bantuan Anda menjaga kualitas Manokos.');
+      setReportOpen(false);
+      setReportForm({ reason: '', details: '' });
+    },
+    onError: () => alert('Gagal mengirim laporan. Coba lagi nanti.')
   });
 
   if (isLoading) {
@@ -238,6 +251,12 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                   <p className="text-[11px] text-[var(--color-text-muted)] font-500">Chat WA</p>
                 </div>
               </div>
+
+              <div className="mt-5 text-center">
+                <button onClick={() => setReportOpen(true)} className="text-[12px] font-600 text-red-500 hover:text-red-700 transition items-center justify-center gap-1.5 mx-auto flex">
+                  <Shield size={14} /> Laporkan Properti
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -271,6 +290,53 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
             className="max-w-full max-h-full object-contain rounded-2xl"
             onClick={e => e.stopPropagation()}
           />
+        </div>
+      )}
+
+      {/* ===== REPORT MODAL ===== */}
+      {reportOpen && (
+        <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm animate-fade-up">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-800 text-[18px]">Laporkan Properti</h3>
+              <button onClick={() => setReportOpen(false)} className="btn btn-ghost p-1 -mr-2"><X size={20} className="text-[var(--color-text-secondary)]"/></button>
+            </div>
+            <p className="text-[13px] text-[var(--color-text-muted)] mb-4">Laporan Anda bersifat rahasia. Admin Manokos akan turun tangan.</p>
+            
+            <div className="mb-4">
+              <label className="block text-[12px] font-700 text-[var(--color-text-primary)] mb-1.5">Alasan Laporan</label>
+              <select 
+                className="input text-[13px] h-10 w-full" 
+                value={reportForm.reason} 
+                onChange={e => setReportForm(f => ({ ...f, reason: e.target.value }))}
+              >
+                <option value="">Pilih alasan...</option>
+                <option value="Harga Tidak Sesuai">Harga aslinya berbeda</option>
+                <option value="Foto Palsu/Menipu">Foto tidak sesuai dengan aslinya</option>
+                <option value="Properti Sudah Penuh">Kamar sebenarnya sudah habis</option>
+                <option value="Kontak Penipu">Curiga penipuan / minta DP aneh</option>
+                <option value="Lainnya">Masalah lainnya</option>
+              </select>
+            </div>
+            
+            <div className="mb-5">
+              <label className="block text-[12px] font-700 text-[var(--color-text-primary)] mb-1.5">Keterangan (Opsional)</label>
+              <textarea 
+                className="input h-24 resize-none w-full text-[13px]" 
+                placeholder="Tuliskan pengalaman atau detail tambahan Anda..."
+                value={reportForm.details}
+                onChange={e => setReportForm(f => ({ ...f, details: e.target.value }))}
+              />
+            </div>
+            
+            <button 
+              className="btn btn-primary w-full"
+              disabled={!reportForm.reason || reportMutation.isPending}
+              onClick={() => reportMutation.mutate(reportForm)}
+            >
+              {reportMutation.isPending ? 'Mengirim Data...' : 'Kirim Laporan'}
+            </button>
+          </div>
         </div>
       )}
     </div>

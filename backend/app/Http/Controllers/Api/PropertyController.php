@@ -13,6 +13,16 @@ class PropertyController extends Controller
     {
         $query = Property::with(['facilities', 'owner'])
             ->where('status', 'active');
+            
+        // Filter by Facilities
+        if ($request->has('facilities') && $request->facilities != '') {
+            $facilitiesArray = explode(',', $request->facilities);
+            foreach ($facilitiesArray as $facilityId) {
+                $query->whereHas('facilities', function ($q) use ($facilityId) {
+                    $q->where('facilities.id', $facilityId);
+                });
+            }
+        }
 
         // Filter by Area
         if ($request->has('area') && $request->area != '') {
@@ -32,10 +42,20 @@ class PropertyController extends Controller
             $query->where('price_monthly', '<=', $request->max_price);
         }
 
-        // Sort: Boosted first, then by latest
-        $properties = $query->orderBy('is_boosted', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate($request->get('per_page', 12));
+        // Filter / Sort by Lat Long radius (Haversine Formula)
+        if ($request->has('lat') && $request->has('lng')) {
+            $lat = (float) $request->lat;
+            $lng = (float) $request->lng;
+            $query->selectRaw("properties.*, ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance", [$lat, $lng, $lat])
+                  ->having('distance', '<', 20) // max radius 20km
+                  ->orderBy('distance', 'asc');
+        } else {
+            // Sort: Boosted first, then by latest
+            $query->orderBy('is_boosted', 'desc')
+                  ->orderBy('created_at', 'desc');
+        }
+
+        $properties = $query->paginate($request->get('per_page', 12));
 
         return response()->json($properties);
     }
@@ -65,5 +85,24 @@ class PropertyController extends Controller
         ));
 
         return response()->json(['message' => 'Click tracked']);
+    }
+
+    public function report(Request $request, $id)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:100',
+            'details' => 'nullable|string',
+        ]);
+
+        $property = Property::findOrFail($id);
+
+        \App\Models\Report::create([
+            'property_id' => $property->id,
+            'reason' => $request->reason,
+            'details' => $request->details,
+            'status' => 'pending'
+        ]);
+
+        return response()->json(['message' => 'Laporan berhasil dikirim dan akan ditinjau.']);
     }
 }
