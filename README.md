@@ -14,14 +14,17 @@ Manokos adalah platform digital repositori terpusat yang menghubungkan pencari k
 
 | Fitur | Status |
 |---|---|
-| Pencarian & Filter (area, tipe, harga) | ✅ |
+| Pencarian & Filter (area, tipe, harga, fasilitas detail) | ✅ |
+| Pencarian GPS Radius "Di Dekat Saya" (Haversine) | ✅ |
+| Modul Laporkan Properti Palsu/Penipuan | ✅ |
 | Peta Leaflet interaktif (multi-pin search, radius privasi detail) | ✅ |
 | Drag-and-drop location picker (owner) | ✅ |
 | Koneksi langsung ke WhatsApp pemilik | ✅ |
 | Sistem KYC upload (KTP + bukti kepemilikan) | ✅ |
 | Admin verifikasi KYC & properti | ✅ |
 | Bookmark / Simpan properti | ✅ |
-| Dashboard pemilik (listing CRUD, statistik) | ✅ |
+| Dashboard pemilik (CRUD, progres profil, toggle aktif cepat) | ✅ |
+| Statistik performa interaktif (Grafik Recharts) | ✅ |
 | Update Log & Changelog publik | ✅ |
 | SEO (meta tags, OpenGraph, sitemap.xml, robots.txt) | ✅ |
 | PWA-ready (manifest, theme color) | ✅ |
@@ -104,6 +107,7 @@ Lihat **[MANUAL_BOOK.md](./MANUAL_BOOK.md)** untuk panduan lengkap instalasi dan
 | GET | `/api/properties` | Daftar properti (filter: area, type, min/max_price) |
 | GET | `/api/properties/{id}` | Detail properti |
 | POST | `/api/properties/{id}/click` | Catat klik WhatsApp |
+| POST | `/api/properties/{id}/report`| Laporkan listing bermasalah |
 | GET | `/api/facilities` | Daftar fasilitas |
 | GET | `/api/changelog` | Update log publik |
 
