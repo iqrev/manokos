@@ -1,8 +1,12 @@
 # Manokos 🏠
 
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
+[![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?logo=laravel)](https://laravel.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+
 **Direktori Kos & Kontrakan Terkurasi untuk Wilayah Jambi**
 
-Manokos adalah platform digital yang menghubungkan pencari kos (mahasiswa, pekerja) dengan pemilik properti secara langsung via WhatsApp. Sebagai MVP, fokus pada visibilitas, verifikasi identitas (KYC), dan kemudahan akses mobile.
+Manokos adalah platform digital repositori terpusat yang menghubungkan pencari kos (mahasiswa, pekerja) dengan pemilik properti secara langsung via WhatsApp. Fokus utama aplikasi ini adalah pada visibilitas tinggi, verifikasi identitas (KYC) yang aman, dan kemudahan akses di perangkat mobile maupun desktop.
 
 ---
 
