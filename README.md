@@ -26,8 +26,10 @@ Manokos adalah platform digital repositori terpusat yang menghubungkan pencari k
 | Dashboard pemilik (CRUD, progres profil, toggle aktif cepat) | ✅ |
 | Statistik performa interaktif (Grafik Recharts) | ✅ |
 | Update Log & Changelog publik | ✅ |
-| SEO (meta tags, OpenGraph, sitemap.xml, robots.txt) | ✅ |
-| PWA-ready (manifest, theme color) | ✅ |
+| SEO (meta tags, SSG area landing pages, sitemap.xml) | ✅ |
+| PWA-ready (offline cache, install prompt) | ✅ |
+| Sistem Ulasan & Rating Bintang | ✅ |
+| Email Alert Kos Baru (Daily) | ✅ |
 
 ---
 
@@ -108,8 +110,10 @@ Lihat **[MANUAL_BOOK.md](./MANUAL_BOOK.md)** untuk panduan lengkap instalasi dan
 | GET | `/api/properties/{id}` | Detail properti |
 | POST | `/api/properties/{id}/click` | Catat klik WhatsApp |
 | POST | `/api/properties/{id}/report`| Laporkan listing bermasalah |
+| GET | `/api/properties/{id}/reviews`| Daftar ulasan properti |
 | GET | `/api/facilities` | Daftar fasilitas |
 | GET | `/api/changelog` | Update log publik |
+| GET | `/api/unsubscribe` | Berhenti berlangganan email |
 
 ### Auth
 | Method | Endpoint | Keterangan |
@@ -148,6 +152,14 @@ Lihat **[MANUAL_BOOK.md](./MANUAL_BOOK.md)** untuk panduan lengkap instalasi dan
 | GET | `/api/bookmarks` | Daftar properti tersimpan |
 | POST | `/api/bookmarks/{id}/toggle` | Toggle simpan/hapus |
 | GET | `/api/bookmarks/{id}/status` | Status bookmark properti |
+
+### Feedback & Notifications (Auth required)
+| Method | Endpoint | Keterangan |
+|---|---|---|
+| POST | `/api/properties/{id}/reviews` | Tambah ulasan & rating |
+| DELETE | `/api/reviews/{id}` | Hapus ulasan milik sendiri |
+| GET | `/api/me/preferences` | Ambil preferensi notifikasi |
+| POST | `/api/me/preferences` | Simpan preferensi notifikasi |
 
 ---
 

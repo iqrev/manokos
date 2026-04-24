@@ -2,6 +2,19 @@
 
 Semua pembaruan pada proyek ini akan dicatat dalam berkas ini. Format log berdasarkan panduan [Keep a Changelog](https://keepachangelog.com/id/1.0.0/).
 
+## [1.2.0] - 2026-04-24
+
+### Ditambahkan
+- **Sistem Ulasan & Rating ⭐:** Pencari kos kini dapat memberikan ulasan tekstual dan rating bintang (1-5) pada setiap properti untuk meningkatkan transparansi.
+- **Multi-Photo Gallery Upload 📸:** Pemilik kos kini dapat mengunggah hingga 8 foto tambahan (total 9 dengan foto utama) untuk memberikan gambaran properti yang lebih detail.
+- **PWA (Progressive Web App) 📱:** Aplikasi kini dapat diinstal di homescreen HP dan desktop, serta mendukung cache offline untuk navigasi yang lebih cepat.
+- **Email Alert Otomatis (Retensi) 📧:** Sistem pengecekan kos baru setiap hari yang mengirimkan ringkasan via email sesuai kawasan favorit pengguna.
+- **Landing Page SEO per Kecamatan 🔍:** URL bersih (`/kos/area/[slug]`) untuk setiap kawasan di Jambi dengan metadata unik untuk optimasi mesin pencari (SSG).
+
+### Diubah
+- **Dashboard Profil User:** Menu Akun yang diperbarui dengan navigasi ke pengaturan notifikasi email.
+- **Sitemap Dinamis:** Pembaruan otomatis XML sitemap untuk menyertakan seluruh landing page kawasan terbaru.
+
 ## [1.1.0] - 2026-04-24
 
 ### Ditambahkan (Fitur Ekosistem Pencari Kos)
